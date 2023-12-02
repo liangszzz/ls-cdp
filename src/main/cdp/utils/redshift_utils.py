@@ -2,7 +2,7 @@ from typing import Dict
 
 from awsglue.context import DataFrame
 
-from my_glue.utils import glue_utils
+from src.main.cdp.utils import glue_utils
 
 
 def get_data_from_redshift(

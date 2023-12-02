@@ -2,7 +2,7 @@ from typing import Union
 
 from boto3 import client
 
-from my_glue.common.exceptions import BizException
+from src.main.cdp.common.exceptions import BizException
 
 
 def get_value(secret_name: str, region_name: str = "ap-northeast-1", enpoint_url: Union[str, None] = None) -> str:

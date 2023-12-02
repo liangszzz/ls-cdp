@@ -28,7 +28,7 @@ def s3():
 
 @pytest.fixture(scope="function", autouse=False)
 def local_pre():
-    current_module_path = os.getcwd()
+    current_module_path = os.path.abspath(__file__)
     index = current_module_path.index("src/tests/cdp")
     current_module_path = current_module_path[:index]
 

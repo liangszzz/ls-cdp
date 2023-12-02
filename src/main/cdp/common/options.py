@@ -30,7 +30,6 @@ class ReadOptions(Enum):
 class WriteOptions(Enum):
     csv_options = {
         "header": "true",
-        "encoding": "utf-8",
         "quote": '"',
         "escape": '"',
         "quoteAll": "true",
