@@ -47,10 +47,10 @@ class Etl(Base):
             df = df.withColumn(column, trim(col(column)))
             # b.decimal parse
             if column in decimal_columns:
-                df = df.withColumn(column, col(column).cast("decimal(15,2)"))
+                df = df.withColumn(column, regexp_replace(column, "\\.$", "")).withColumn(column, col(column).cast("decimal(15,2)"))
             # c.date parse
             if column in date_columns:
-                df = df.withColumn(column, to_date(col(column), self.args["date_fromat"]))
+                df= df.withColumn(column, regexp_replace(column, "\\.$", "")).withColumn(column, to_date(col(column), self.args["date_fromat"]))
 
         self.export_df = df
 
