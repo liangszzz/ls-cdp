@@ -29,32 +29,6 @@ class Base:
         self.config_dict: Dict[str, str] = {}
         self.config = config
 
-        self.default_csv_options = {
-            "header": "true",
-            "encoding": "utf-8",
-            "quote": '"',
-            "escape": '"',
-            "quoteAll": "true",
-        }
-
-        self.default_tsv_options = {
-            "header": "true",
-            "encoding": "utf-8",
-            "quote": '"',
-            "escape": '"',
-            "quoteAll": "true",
-            "delimiter": "\t",
-        }
-
-        self.default_parquet_options = {
-            "encoding": "utf-8",
-        }
-
-        self.default_fixed_options = {
-            "header": "false",
-            "encoding": "utf-8",
-        }
-
     def init_config(self) -> None:
         self.config_dict = self.config.load_config()
 
@@ -137,20 +111,26 @@ class Base:
     def load_s3_file(
             self,
             section: str,
+            optional_args: Dict[str, Any],
             cache_flag: bool = False,
-            create_view_flag: bool = True,
-            format_map: Union[None, Dict[str, str]] = None,
-            optional_args: Union[None, Dict[str, Any]] = None,
+            create_view_flag: bool = False,
+            format_map: Union[None, Dict[str, str]] = None
     ) -> DataFrame:
-        bucket = self.config_dict[f"{section}.{InputOutputConfig.BUCKET.value}"]
-        prefix = self.config_dict[f"{section}.{InputOutputConfig.PATH.value}"]
-        view_name = self.config_dict[f"{section}.{InputOutputConfig.TABLE_NAME.value}"]
-        required = self.config_dict[f"{section}.{InputOutputConfig.REQUIRED.value}"]
-        schema = self.config_dict[f"{section}.{InputOutputConfig.SCHEMA.value}"]
-        file_type = self.config_dict[f"{section}.{InputOutputConfig.TYPE.value}"]
 
-        success_msg = self.config_dict[f"{section}.{InputOutputConfig.SUCCESS_MSG.value}"]
-        error_msg = self.config_dict[f"{section}.{InputOutputConfig.ERROR_MSG.value}"]
+        try:
+            bucket = self.config_dict[f"{section}.{InputOutputConfig.BUCKET.value}"]
+            prefix = self.config_dict[f"{section}.{InputOutputConfig.PATH.value}"]
+            view_name = self.config_dict[f"{section}.{InputOutputConfig.TABLE_NAME.value}"]
+            required = self.config_dict[f"{section}.{InputOutputConfig.REQUIRED.value}"]
+            schema = self.config_dict[f"{section}.{InputOutputConfig.SCHEMA.value}"]
+            file_type = self.config_dict[f"{section}.{InputOutputConfig.TYPE.value}"]
+
+            success_msg = self.config_dict[f"{section}.{InputOutputConfig.SUCCESS_MSG.value}"]
+            error_msg = self.config_dict[f"{section}.{InputOutputConfig.ERROR_MSG.value}"]
+        except Exception as e:
+            # TODO
+            raise exceptions.BizException("BizException")
+
         if format_map is not None:
             bucket = bucket.format_map(format_map)
             prefix = prefix.format_map(format_map)
@@ -163,23 +143,30 @@ class Base:
 
         s3 = get_client()
 
-        file_format = "csv"
-        if "parquet" in file_type:
-            file_format = "parquet"
-
-        if s3_utils.check_s3_file_or_dir_exist(s3, bucket, prefix):
-            df = glue_utils.load_df_from_s3(self.context, f"s3://{bucket}/{prefix}", file_format=file_format,
-                                            options=optional_args)
+        s3_path = f"s3://{bucket}/{prefix}"
+        if s3_utils.check_s3_file_or_dir_exist(s3, bucket, prefix, "dir" in file_type):
+            if "csv" in file_type or "tsv" in file_type or "txt" in file_type or "fixed" in file_type:
+                df = self.spark.read.csv(s3_path, **optional_args)
+            elif "parquet" in file_type:
+                df = self.spark.read.parquet(s3_path, **optional_args)
+            else:
+                raise exceptions.NotImplementedException()
         else:
             if required == "True":
                 self.logger.error(error_msg.format_map({"bucket": bucket, "prefix": prefix}))
                 raise exceptions.S3FileNotExistException(f"s3://{bucket}/{prefix}")
             else:
                 df = self.context.createDataFrame([], schema)
+
+        if glue_utils.check_df_count_is_zero(df):
+            self.logger.warn("{} file's record number is 0".format(s3_path))
+
         if cache_flag:
             df.cache()
+
         if create_view_flag:
             df.createOrReplaceTempView(view_name)
+
         self.logger.info(success_msg)
         return df
 
@@ -187,11 +174,9 @@ class Base:
             self,
             section: str,
             df: DataFrame,
+            optional_args: Dict[str, Any],
             format_map: Union[None, Dict[str, str]] = None,
-            optional_args: Union[None, Dict[str, Any]] = None,
     ) -> None:
-        if optional_args is not None:
-            optional_args["compression"] = "gzip"
 
         file_type = self.config_dict[f"{section}.{InputOutputConfig.TYPE.value}"]
         bucket = self.config_dict[f"{section}.{InputOutputConfig.BUCKET.value}"]
@@ -206,10 +191,16 @@ class Base:
             success_msg = success_msg.format_map((format_map))
             error_msg = error_msg.format_map((format_map))
 
-        if InputOutType.S3_DIR_PARQUET.value == file_type:
-            glue_utils.export_data_frame_to_parquet(df, f"s3://{bucket}/{prefix}", options=optional_args)
-        elif "csv" in file_type:
-            glue_utils.export_data_frame_to_csv_dir(df, f"s3://{bucket}/{prefix}", options=optional_args)
-        else:
-            raise exceptions.NotImplementedException()
+        try:
+            if InputOutType.S3_DIR_PARQUET.value == file_type:
+                df.write.mode("overwrite").parquet(f"s3://{bucket}/{prefix}", **optional_args)
+            elif "csv" in file_type or "tsv" in file_type or "txt" in file_type:
+                df.write.mode("overwrite").csv(f"s3://{bucket}/{prefix}", **optional_args)
+            else:
+                raise exceptions.NotImplementedException()
+        except Exception as e:
+            self.logger.error(error_msg)
+            raise e
+
+        self.logger.info(success_msg)
         return None

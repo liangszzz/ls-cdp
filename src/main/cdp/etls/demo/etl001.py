@@ -1,9 +1,11 @@
 from awsglue.context import GlueContext
 from pyspark.sql.functions import col, regexp_replace, to_date, trim
 
-from my_glue.common.base import Base
-from my_glue.common.config import Config, ConfigType
-from my_glue.utils import glue_utils
+from src.main.cdp.common.base import Base
+from src.main.cdp.common.config import Config, ConfigType
+from src.main.cdp.common.options import ReadOptions, WriteOptions
+from src.main.cdp.utils import glue_utils
+from src.main.cdp.common.exceptions import NotImplementedException
 
 
 class Etl(Base):
@@ -14,22 +16,23 @@ class Etl(Base):
         super().handler_args()
 
     def load_data(self) -> None:
-        optional_args = None
         if "csv" in self.args["input_file_type"] or "txt" in self.args["input_file_type"]:
-            optional_args = self.defalut_csv_options
+            optional_args = ReadOptions.csv_options.value
         elif "tsv" in self.args["input_file_type"]:
-            optional_args = self.defalut_tsv_options
+            optional_args = ReadOptions.tsv_options.value
+        else:
+            raise NotImplementedException()
 
         self.input_df = self.load_s3_file(
             "input1",
+            optional_args,
             create_view_flag=False,
             format_map={
                 "action_date": self.action_date,
                 "input_file_type": self.args["input_file_type"],
                 "input_file_bucket": self.args["input_file_bucket"],
                 "input_file_path": self.args["input_file_path"],
-            },
-            optional_args=optional_args,
+            }
         )
 
     def handle_data(self) -> None:
@@ -38,15 +41,17 @@ class Etl(Base):
 
         columns = self.input_df.columns
         df = self.input_df
+
         for column in columns:
             # a.trim
-            df = df.withColumn(column, regexp_replace(trim(col(column)), "\\.$", ""))
+            df = df.withColumn(column, trim(col(column)))
             # b.decimal parse
             if column in decimal_columns:
                 df = df.withColumn(column, col(column).cast("decimal(15,2)"))
             # c.date parse
             if column in date_columns:
                 df = df.withColumn(column, to_date(col(column), self.args["date_fromat"]))
+
         self.export_df = df
 
     def export_data(self) -> None:
@@ -54,12 +59,12 @@ class Etl(Base):
         self.export_to_s3(
             "output1",
             self.export_df,
+            WriteOptions.parquet_options.value,
             format_map={
                 "action_date": self.action_date,
                 "output_file_bucket": self.args["output_file_bucket"],
                 "output_file_path": self.args["output_file_path"],
-            },
-            optional_args=self.defalut_parquet_options,
+            }
         )
 
 

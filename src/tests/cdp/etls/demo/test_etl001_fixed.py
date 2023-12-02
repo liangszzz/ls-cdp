@@ -2,14 +2,14 @@ import sys
 
 import pytest
 
-from my_glue.common.config import Config, ConfigType
-from my_glue.etl.etl001_fixed import Etl
-from my_glue.utils.s3_utils import download_s3_bucket, upload_dir_or_file
+from src.main.cdp.common.config import Config, ConfigType
+from src.main.cdp.etls.demo.etl001_fixed import Etl
+from src.main.cdp.utils.s3_utils import download_s3_bucket, upload_dir_or_file
 
 
 def test_run_fixed(glue_context, s3, caplog, tmpdir, local_pre, upload_data):
     sys.argv.append("--action_date=20231020")
-    sys.argv.append("--input_file_type=s3-fixed")
+    sys.argv.append("--input_file_type=s3-dir-fixed")
     sys.argv.append("--input_file_bucket=cdp-input1")
     sys.argv.append("--input_file_path=path/004")
     sys.argv.append("--output_file_bucket=cdp-output1")
@@ -31,5 +31,5 @@ def test_run_fixed(glue_context, s3, caplog, tmpdir, local_pre, upload_data):
 @pytest.fixture(scope="function")
 def upload_data(s3, local_pre):
     # shutil.rmtree("download")
-    upload_dir_or_file(f"{local_pre}/tests-resources/etl001/config", s3, "cdp-input0")
-    upload_dir_or_file(f"{local_pre}/tests-resources/etl001/input1", s3, "cdp-input1")
+    upload_dir_or_file(f"{local_pre}/src/tests/resources/etls/demo/etl001/config", s3, "cdp-input0")
+    upload_dir_or_file(f"{local_pre}/src/tests/resources/etls/demo/etl001/input1", s3, "cdp-input1")

@@ -1,5 +1,4 @@
 .venv
-.log
 .coverage
 .pytest_*
 .tmp
@@ -9,3 +8,5 @@ download
 __pycache__
 poetry.lock
 .mypy_cache
+.pytest_cache
+logger.log

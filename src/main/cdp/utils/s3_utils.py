@@ -97,7 +97,9 @@ def read_s3_file(s3: client, bucket: str, path: str) -> str:
     raise S3FileNotExistException(f"s3://{bucket}/{path}")
 
 
-def rename_s3_file(s3: client, input_bucket: str, output_bucket: str, input_path: str, output_path: str, delete: bool) -> None:
+def rename_s3_file(
+    s3: client, input_bucket: str, output_bucket: str, input_path: str, output_path: str, delete: bool
+) -> None:
     """
     Rename a file from an S3 bucket at a given path.
 

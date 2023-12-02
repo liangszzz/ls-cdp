@@ -1,10 +1,19 @@
 from awsglue.context import GlueContext
-from pyspark.sql.functions import (col, decode, encode, regexp_replace,
-                                   substring, to_date, trim)
+from pyspark.sql.functions import (
+    col,
+    decode,
+    encode,
+    regexp_replace,
+    substring,
+    to_date,
+    trim,
+)
 
-from my_glue.common.base import Base
-from my_glue.common.config import Config, ConfigType
-from my_glue.utils import glue_utils
+from src.main.cdp.common.base import Base
+from src.main.cdp.common.config import Config, ConfigType
+from src.main.cdp.utils import glue_utils
+
+from src.main.cdp.common.options import ReadOptions, WriteOptions
 
 
 class Etl(Base):
@@ -16,17 +25,17 @@ class Etl(Base):
         self.charset = self.args["charset"]
 
     def load_data(self) -> None:
-        self.defalut_fixed_options["encoding"] = self.charset
+        fixed_options = ReadOptions.fixed_options.value
+        fixed_options["encoding"] = self.charset
         df = self.load_s3_file(
             "input1",
-            create_view_flag=False,
+            fixed_options,
             format_map={
                 "action_date": self.action_date,
                 "input_file_type": self.args["input_file_type"],
                 "input_file_bucket": self.args["input_file_bucket"],
                 "input_file_path": self.args["input_file_path"],
-            },
-            optional_args=self.defalut_fixed_options,
+            }
         )
         df = df.withColumn("value", encode("_c0", self.charset))
         self.input_df = df
@@ -50,7 +59,7 @@ class Etl(Base):
 
         for column in columns:
             # a.trim
-            df = df.withColumn(column, regexp_replace(trim(col(column)), "\\.$", ""))
+            df = df.withColumn(column, trim(col(column)))
             # b.decimal parse
             if column in decimal_columns:
                 df = df.withColumn(column, col(column).cast("decimal(15,2)"))
@@ -63,12 +72,12 @@ class Etl(Base):
         self.export_to_s3(
             "output1",
             self.export_df,
+            WriteOptions.parquet_options.value,
             format_map={
                 "action_date": self.action_date,
                 "output_file_bucket": self.args["output_file_bucket"],
                 "output_file_path": self.args["output_file_path"],
             },
-            optional_args=self.defalut_parquet_options,
         )
 
 

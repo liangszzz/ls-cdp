@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Union
 
-from cdp.common.exceptions import NotImplementedException
+from src.main.cdp.common.exceptions import NotImplementedException
 from src.main.cdp.utils.s3_utils import get_client, read_s3_file
 
 
@@ -19,6 +19,7 @@ class InputOutType(Enum):
     S3_DIR_CSV = "s3-dir-csv"
     S3_DIR_TSV = "s3-dir-tsv"
     S3_DIR_TXT = "s3-dir-txt"
+    S3_DIR_FIXED = "s3-dir-fixed"
     S3_DIR_PARQUET = "s3-dir-parquet"
     # table
     CATALOG = "catalog"

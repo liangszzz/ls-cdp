@@ -5,8 +5,8 @@ import sys
 import pytest
 from awsglue.context import GlueContext, SparkSession
 
-from my_glue.utils import log_utils
-from my_glue.utils.s3_utils import get_client
+from src.main.cdp.utils import log_utils
+from src.main.cdp.utils.s3_utils import get_client
 
 input_bucket = "cdp-input"
 output_bucket = "cdp-output"
@@ -19,11 +19,6 @@ region_name = "ap-northeast-1"
 logger = log_utils.get_logger(__name__)
 
 
-current_module_path = os.getcwd()
-index = current_module_path.index("my_glue")
-current_module_path = current_module_path[: index + 7]
-
-
 @pytest.fixture(scope="function")
 def s3():
     logger.info("--------------------------start s3 init---------------------------")
@@ -33,6 +28,10 @@ def s3():
 
 @pytest.fixture(scope="function", autouse=False)
 def local_pre():
+    current_module_path = os.getcwd()
+    index = current_module_path.index("src/tests/cdp")
+    current_module_path = current_module_path[:index]
+
     try:
         shutil.rmtree(f"{current_module_path}/download")
     except Exception as e:
