@@ -1,0 +1,50 @@
+[tool.poetry]
+name = "fj-cdp"
+version = "0.1.0"
+description = ""
+authors = ["liangszzz <liang-shan@outlook.com>"]
+readme = "README.md"
+packages = [{ include = "src/main/cdp", from = "." }]
+
+
+[tool.poetry.dependencies]
+python = "^3.10.2"
+boto3 = "^1.24.70"
+pytz = "^2021.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.1"
+pytest-mock = "^3.10.0"
+pytest-cov = "^4.1.0"
+black = "^23.3.0"
+isort = "^5.11.2"
+flake8 = "^6.1.0"
+mypy = "^1.7.1"
+pyproject-flake8 = "^6.1.0"
+types-pytz = "^2023.3.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 160
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+
+known_third_party = ["third_party_library"]
+
+
+[tool.mypy]
+no_strict_optional = true
+ignore_missing_imports = true
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["src/main/tests", ]
+filterwarnings = ["ignore::DeprecationWarning", ]
+
