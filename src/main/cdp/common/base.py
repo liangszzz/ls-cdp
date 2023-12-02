@@ -109,14 +109,13 @@ class Base:
         self.logger_end()
 
     def load_s3_file(
-            self,
-            section: str,
-            optional_args: Dict[str, Any],
-            cache_flag: bool = False,
-            create_view_flag: bool = False,
-            format_map: Union[None, Dict[str, str]] = None
+        self,
+        section: str,
+        optional_args: Dict[str, Any],
+        cache_flag: bool = False,
+        create_view_flag: bool = False,
+        format_map: Union[None, Dict[str, str]] = None,
     ) -> DataFrame:
-
         try:
             bucket = self.config_dict[f"{section}.{InputOutputConfig.BUCKET.value}"]
             prefix = self.config_dict[f"{section}.{InputOutputConfig.PATH.value}"]
@@ -171,13 +170,12 @@ class Base:
         return df
 
     def export_to_s3(
-            self,
-            section: str,
-            df: DataFrame,
-            optional_args: Dict[str, Any],
-            format_map: Union[None, Dict[str, str]] = None,
+        self,
+        section: str,
+        df: DataFrame,
+        optional_args: Dict[str, Any],
+        format_map: Union[None, Dict[str, str]] = None,
     ) -> None:
-
         file_type = self.config_dict[f"{section}.{InputOutputConfig.TYPE.value}"]
         bucket = self.config_dict[f"{section}.{InputOutputConfig.BUCKET.value}"]
         prefix = self.config_dict[f"{section}.{InputOutputConfig.PATH.value}"]

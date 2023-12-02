@@ -2,8 +2,8 @@ from awsglue.context import GlueContext
 
 from src.main.cdp.common.base import Base
 from src.main.cdp.common.config import Config, ConfigType
-from src.main.cdp.utils import glue_utils
 from src.main.cdp.common.options import ReadOptions, WriteOptions
+from src.main.cdp.utils import glue_utils
 
 
 class Etl(Base):

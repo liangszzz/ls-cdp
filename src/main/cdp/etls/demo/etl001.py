@@ -3,9 +3,9 @@ from pyspark.sql.functions import col, regexp_replace, to_date, trim
 
 from src.main.cdp.common.base import Base
 from src.main.cdp.common.config import Config, ConfigType
+from src.main.cdp.common.exceptions import NotImplementedException
 from src.main.cdp.common.options import ReadOptions, WriteOptions
 from src.main.cdp.utils import glue_utils
-from src.main.cdp.common.exceptions import NotImplementedException
 
 
 class Etl(Base):
@@ -32,7 +32,7 @@ class Etl(Base):
                 "input_file_type": self.args["input_file_type"],
                 "input_file_bucket": self.args["input_file_bucket"],
                 "input_file_path": self.args["input_file_path"],
-            }
+            },
         )
 
     def handle_data(self) -> None:
@@ -47,10 +47,14 @@ class Etl(Base):
             df = df.withColumn(column, trim(col(column)))
             # b.decimal parse
             if column in decimal_columns:
-                df = df.withColumn(column, regexp_replace(column, "\\.$", "")).withColumn(column, col(column).cast("decimal(15,2)"))
+                df = df.withColumn(column, regexp_replace(column, "\\.$", "")).withColumn(
+                    column, col(column).cast("decimal(15,2)")
+                )
             # c.date parse
             if column in date_columns:
-                df= df.withColumn(column, regexp_replace(column, "\\.$", "")).withColumn(column, to_date(col(column), self.args["date_fromat"]))
+                df = df.withColumn(column, regexp_replace(column, "\\.$", "")).withColumn(
+                    column, to_date(col(column), self.args["date_fromat"])
+                )
 
         self.export_df = df
 
@@ -64,7 +68,7 @@ class Etl(Base):
                 "action_date": self.action_date,
                 "output_file_bucket": self.args["output_file_bucket"],
                 "output_file_path": self.args["output_file_path"],
-            }
+            },
         )
 
 

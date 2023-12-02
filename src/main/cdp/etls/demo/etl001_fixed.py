@@ -11,9 +11,8 @@ from pyspark.sql.functions import (
 
 from src.main.cdp.common.base import Base
 from src.main.cdp.common.config import Config, ConfigType
-from src.main.cdp.utils import glue_utils
-
 from src.main.cdp.common.options import ReadOptions, WriteOptions
+from src.main.cdp.utils import glue_utils
 
 
 class Etl(Base):
@@ -35,7 +34,7 @@ class Etl(Base):
                 "input_file_type": self.args["input_file_type"],
                 "input_file_bucket": self.args["input_file_bucket"],
                 "input_file_path": self.args["input_file_path"],
-            }
+            },
         )
         df = df.withColumn("value", encode("_c0", self.charset))
         self.input_df = df
