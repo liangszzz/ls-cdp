@@ -85,8 +85,6 @@ services:
       dockerfile: doc/docker-for-test/Dockerfile
     depends_on:
       - localstack
-#    volumes:
-#      - .:/home/glue_user/workspace/fj-cdp
     networks:
       - default
     tty: true

@@ -7,19 +7,20 @@ RUN yum update -y
 
 RUN yum install -y openssh-server && yum install -y passwd && yum install -y openssh-clients && yum clean all
 
-ADD ssh_file/sshd_config /etc/ssh/sshd_config
-ADD ssh_file/ssh_host_ecdsa_key /etc/ssh/ssh_host_ecdsa_key
-ADD ssh_file/ssh_host_ed25519_key /etc/ssh/ssh_host_ed25519_key
-ADD ssh_file/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key
-ADD ssh_file/ssh_host_ecdsa_key.pub /etc/ssh/ssh_host_ecdsa_key.pub
-ADD ssh_file/ssh_host_ed25519_key.pub /etc/ssh/ssh_host_ed25519_key.pub
-ADD ssh_file/ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub
+ADD doc/docker-for-dev/ssh_file/ssh_host_ecdsa_key /etc/ssh/ssh_host_ecdsa_key
+ADD doc/docker-for-dev/ssh_file/ssh_host_ed25519_key /etc/ssh/ssh_host_ed25519_key
+ADD doc/docker-for-dev/ssh_file/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key
+ADD doc/docker-for-dev/ssh_file/ssh_host_ecdsa_key.pub /etc/ssh/ssh_host_ecdsa_key.pub
+ADD doc/docker-for-dev/ssh_file/ssh_host_ed25519_key.pub /etc/ssh/ssh_host_ed25519_key.pub
+ADD doc/docker-for-dev/ssh_file/ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub
 
-ADD .aws /home/glue_user/.aws
+RUN chmod 600 -R /etc/ssh/*
 
-RUN chmod 755 -R /etc/ssh/*
+ADD doc/docker-for-dev/ssh_file/sshd_config /etc/ssh/sshd_config
 
-ADD shell/run_sshd.sh /usr/local/sbin/run_sshd.sh
+RUN chmod 644 -R /etc/ssh/sshd_config
+
+ADD doc/docker-for-dev/shell/run_sshd.sh /usr/local/sbin/run_sshd.sh
 RUN chmod +x /usr/local/sbin/run_sshd.sh
 
 RUN echo 'root:123456' | chpasswd
@@ -45,10 +46,12 @@ EXPOSE 8998
 
 CMD ["/usr/local/sbin/run_sshd.sh"]
 
-USER glue_user
-
 RUN python3 -m pip install --upgrade pip
-RUN pip install -U poetry
 
-WORKDIR /home/glue_user/workspace
+COPY . /home/glue_user/workspace/fj-cdp
+WORKDIR /home/glue_user/workspace/fj-cdp
+RUN pip install -U poetry
+RUN poetry install -v
 RUN aws configure set aws_access_key_id "test" --profile default && aws configure set aws_secret_access_key "test" --profile default && aws configure set region "ap-northeast-1" --profile default && aws configure set output "text" --profile default
+RUN chmod -R 755 shell/dev/*.sh
+RUN mkdir .checks

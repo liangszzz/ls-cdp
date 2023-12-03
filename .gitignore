@@ -1,0 +1,11 @@
+.checks
+.idea
+.vscode
+.venv
+poetry.lock
+__pycache__
+logger.log
+.mypy_cache
+.pytest_cache
+download
+tmp
