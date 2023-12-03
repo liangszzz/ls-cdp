@@ -28,9 +28,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
         poetry install -v
-    - name: flake8 and mypy
+    - name: flake8
       run: |
-        sh run_check.sh
+        poetry run flake8 src --count --exit-zero
+    - name: mypy
+      run: |
+        poetry run mypy src
     - name: localstack install
       run: |
         pip install localstack awscli-local
