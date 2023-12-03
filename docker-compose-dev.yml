@@ -74,6 +74,9 @@ services:
       HOSTNAME_EXTERNAL: localstack
       USE_SINGLE_REGION: 1
       USER: localstack
+    volumes: 
+      - localstack_data:/tmp/volumes/localstack
+    working_dir: /opt/code/localstack
     networks: 
       - default
 
@@ -82,11 +85,17 @@ services:
     container_name: glue4
     build: 
       context: .
-      dockerfile: Dockerfile
+      dockerfile: doc/docker-for-dev/Dockerfile
+    ports: 
+      - 2222:22
     volumes: 
-      - ./fj-cdp:/home/glue_user/workspace/jupyter_workspace/fj-cdp
+      - glue_libs_data:/tmp/glue-libs
     depends_on: 
       - localstack
     networks: 
       - default
     tty: true
+
+volumes: 
+  localstack_data:
+  glue_libs_data:

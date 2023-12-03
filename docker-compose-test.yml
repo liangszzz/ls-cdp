@@ -1,12 +1,12 @@
 # Use root/example as user/password credentials
 version: '3.1'
 
-services: 
+services:
 
-  localstack: 
+  localstack:
     container_name: localstack
     image: localstack/localstack
-    ports: 
+    ports:
       - 4510:4510
       - 4511:4511
       - 4512:4512
@@ -59,7 +59,7 @@ services:
       - 4559:4559
       - 4566:4566
       - 5678:5678
-    environment: 
+    environment:
       AWS_DEFAULT_REGION: ap-northeast-1
       AWS_ACCESS_KEY_ID: test
       AWS_SECRET_ACCESS_KEY: test
@@ -74,28 +74,19 @@ services:
       HOSTNAME_EXTERNAL: localstack
       USE_SINGLE_REGION: 1
       USER: localstack
-    volumes: 
-      - localstack_data:/tmp/volumes/localstack
-    working_dir: /opt/code/localstack
-    networks: 
+    networks:
       - default
 
 
-  glue: 
+  glue:
     container_name: glue4
-    build: 
+    build:
       context: .
-      dockerfile: Dockerfile
-    ports: 
-      - 2222:22
-    volumes: 
-      - glue_libs_data:/tmp/glue-libs
-    depends_on: 
+      dockerfile: doc/docker-for-test/Dockerfile
+    depends_on:
       - localstack
-    networks: 
+#    volumes:
+#      - .:/home/glue_user/workspace/fj-cdp
+    networks:
       - default
     tty: true
-
-volumes: 
-  localstack_data:
-  glue_libs_data:
