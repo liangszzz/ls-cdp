@@ -36,7 +36,7 @@ class BizException(Exception):
     business exception
     """
 
-    def __init__(self, message):
+    def __init__(self, message, e):
         super().__init__(message)
 
 
@@ -45,7 +45,7 @@ class ParamNotFoundException(Exception):
     parameter not found exception
     """
 
-    def __init__(self, message):
+    def __init__(self, message, e):
         super().__init__("parameter [{0}] is not found".format(message))
 
 

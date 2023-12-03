@@ -19,7 +19,7 @@ def get_value(secret_name: str, region_name: str = "ap-northeast-1", enpoint_url
 
 
 def create_value(
-    secret_name: str, secret_value: str, region_name: str = "ap-northeast-1", enpoint_url: Union[str, None] = None
+        secret_name: str, secret_value: str, region_name: str = "ap-northeast-1", enpoint_url: Union[str, None] = None
 ) -> None:
     if enpoint_url is None:
         secretsmanager = client("secretsmanager", region_name=region_name)
@@ -31,4 +31,4 @@ def create_value(
         SecretString=secret_value,
     )
     if "Name" not in response:
-        raise BizException("Secret create error")
+        raise BizException("Secret create error", None)
