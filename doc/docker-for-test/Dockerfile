@@ -27,4 +27,4 @@ WORKDIR /home/glue_user/workspace/fj-cdp
 RUN pip install -U poetry
 RUN poetry install -v
 RUN aws configure set aws_access_key_id "test" --profile default && aws configure set aws_secret_access_key "test" --profile default && aws configure set region "ap-northeast-1" --profile default && aws configure set output "text" --profile default
-RUN chomd -R 755 shell/*.sh
+RUN chmod -R 755 shell/test/*.sh
