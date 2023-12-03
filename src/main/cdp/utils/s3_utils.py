@@ -1,28 +1,22 @@
 import os
-import sys
 
 from boto3 import client, resource
 
 from src.main.cdp.common.exceptions import S3FileNotExistException
-
-endpoint_url = "http://localstack:4566"
-aws_access_key_id = "test"
-aws_secret_access_key = "test"
-region_name = "ap-northeast-1"
+from src.main.cdp.utils.sys_utils import is_dev_env
 
 s3_cache = {"s3": None, "s3r": None}
+
+local_endpoint_url = "http://localstack:4566"
 
 
 def get_client() -> client:
     if s3_cache["s3"] is not None:
         return s3_cache["s3"]
-    if "--dev" in sys.argv:
+    if is_dev_env:
         s3 = client(
             "s3",
-            endpoint_url=endpoint_url,
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-            region_name=region_name,
+            endpoint_url=local_endpoint_url,
             use_ssl=False,
         )
     else:
@@ -35,13 +29,10 @@ def get_resource() -> client:
     if s3_cache["s3r"] is not None:
         return s3_cache["s3r"]
 
-    if "--dev" in sys.argv:
+    if is_dev_env:
         s3r = resource(
             "s3",
-            endpoint_url=endpoint_url,
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-            region_name=region_name,
+            endpoint_url=local_endpoint_url,
             use_ssl=False,
         )
     else:

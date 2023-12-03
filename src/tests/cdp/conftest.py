@@ -13,7 +13,6 @@ output_bucket = "cdp-output"
 
 endpoint_url = "http://localstack:4566"
 aws_access_key_id = "test"
-aws_secret_access_key = "test"
 region_name = "ap-northeast-1"
 
 logger = log_utils.get_logger(__name__)
@@ -52,7 +51,7 @@ def glue_context(tmpdir):
     spark_context = (
         SparkSession.builder.config("spark.hadoop.fs.s3a.endpoint", endpoint_url)
         .config("fs.s3a.access.key", aws_access_key_id)
-        .config("fs.s3a.secret.key", aws_secret_access_key)
+        .config("fs.s3a.secret.key", aws_access_key_id)
         .config("spark.hadoop.fs.s3a.region", region_name)
         .config("spark.hadoop.fs.s3a.format", "json")
         .config("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
@@ -116,8 +115,8 @@ def delete_s3_bucket(bucket: str):
                 file_key = obj["Key"]
                 s3.delete_object(Bucket=bucket, Key=file_key)
         s3.delete_bucket(Bucket=bucket)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error("delete s3 bucket error", e)
 
 
 def clear_sys_argv():
