@@ -1,2 +1,2 @@
 #!/bin/bash
-poetry run mypy --json-report src > .checks/mypy_results.json
+poetry run mypy src > .checks/mypy_output.txt 2>&1
