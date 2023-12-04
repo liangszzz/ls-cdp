@@ -13,7 +13,7 @@ local_endpoint_url = "http://localstack:4566"
 def get_client() -> client:
     if s3_cache["s3"] is not None:
         return s3_cache["s3"]
-    if is_dev_env:
+    if is_dev_env():
         s3 = client(
             "s3",
             endpoint_url=local_endpoint_url,
@@ -29,7 +29,7 @@ def get_resource() -> client:
     if s3_cache["s3r"] is not None:
         return s3_cache["s3r"]
 
-    if is_dev_env:
+    if is_dev_env():
         s3r = resource(
             "s3",
             endpoint_url=local_endpoint_url,

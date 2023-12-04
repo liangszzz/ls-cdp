@@ -9,7 +9,7 @@ from src.main.cdp.utils.s3_utils import upload_dir_or_file
 
 def test_logger_start_end(glue_context, upload_data, caplog):
     sys.argv.append("--action_date=20231020")
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     etl.logger_start()
@@ -33,14 +33,14 @@ def test_logger_start_end(glue_context, upload_data, caplog):
 
 
 def test_init_optional_params_1(glue_context, upload_data):
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     etl.init_optional_params()
 
 
 def test_init_optional_params_2(glue_context, upload_data):
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     etl.config_dict[ConfigFile.OPTIONAL_PARAMS.value] = "action_date"
@@ -49,7 +49,7 @@ def test_init_optional_params_2(glue_context, upload_data):
 
 def test_init_optional_params_3(glue_context, upload_data):
     sys.argv.append("--action_date=20231020")
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     etl.config_dict[ConfigFile.OPTIONAL_PARAMS.value] = "action_date"
@@ -58,7 +58,7 @@ def test_init_optional_params_3(glue_context, upload_data):
 
 def test_init_optional_params_4(glue_context, upload_data):
     sys.argv.append("--action_date=20231020")
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     del etl.config_dict[ConfigFile.OPTIONAL_PARAMS.value]
@@ -66,14 +66,14 @@ def test_init_optional_params_4(glue_context, upload_data):
 
 
 def test_init_required_params_1(glue_context, upload_data):
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     etl.init_required_params()
 
 
 def test_init_required_params_2(glue_context, upload_data):
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     del etl.config_dict[ConfigFile.REQUIRED_PARAMS.value]
@@ -81,7 +81,7 @@ def test_init_required_params_2(glue_context, upload_data):
 
 
 def test_init_required_params_3(glue_context, upload_data):
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     etl.config_dict[ConfigFile.REQUIRED_PARAMS.value] = ""
@@ -89,7 +89,7 @@ def test_init_required_params_3(glue_context, upload_data):
 
 
 def test_check_required_params_1(glue_context, upload_data):
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     etl.init_required_params()
@@ -97,7 +97,7 @@ def test_check_required_params_1(glue_context, upload_data):
 
 
 def test_check_required_params_2(glue_context, upload_data):
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
 
@@ -110,14 +110,14 @@ def test_check_required_params_2(glue_context, upload_data):
 
 
 def test_run(glue_context, upload_data):
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.run()
 
 
 def test_handler_action_date_1(glue_context, upload_data):
     sys.argv.append("--action_date=20231020")
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     etl.config_dict[ConfigFile.OPTIONAL_PARAMS.value] = "action_date"
@@ -130,7 +130,7 @@ def test_handler_action_date_1(glue_context, upload_data):
 
 def test_handler_action_date_2(glue_context, upload_data):
     sys.argv.append("--action_date=20231020XXX")
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     etl.config_dict[ConfigFile.OPTIONAL_PARAMS.value] = "action_date"
@@ -145,7 +145,7 @@ def test_handler_action_date_2(glue_context, upload_data):
 
 
 def test_load_s3_file_1(glue_context, upload_data):
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     del etl.config_dict["input1.bucket"]
@@ -167,7 +167,7 @@ def test_load_s3_file_1(glue_context, upload_data):
 
 
 def test_load_s3_file_2(glue_context, upload_data):
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
 
@@ -275,7 +275,7 @@ def test_load_s3_file_2(glue_context, upload_data):
 
 
 def test_export_tos3_1(glue_context, upload_data):
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     del etl.config_dict["output1.bucket"]
@@ -297,7 +297,7 @@ def test_export_tos3_1(glue_context, upload_data):
 
 
 def test_export_tos3_2(glue_context, upload_data):
-    config = Config(ConfigType.S3, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
     etl = Base(glue_context, config)
     etl.init_config()
     df = etl.load_s3_file(
