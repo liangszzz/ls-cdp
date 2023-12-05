@@ -5,7 +5,7 @@ services:
 
   localstack:
     container_name: localstack
-    image: localstack/localstack
+    image: localstack/localstack:latest-arm64
     ports:
       - 4510:4510
       - 4511:4511
@@ -85,6 +85,8 @@ services:
       dockerfile: doc/docker-for-dev/arm/Dockerfile
     ports:
       - 2222:22
+    environment:
+      PYTHONPATH: /home/glue_user/aws-glue-libs/PyGlue.zip:/home/glue_user/spark/python/lib/py4j-0.10.9.5-src.zip:/home/glue_user/spark/python/
     depends_on:
       - localstack
     networks:

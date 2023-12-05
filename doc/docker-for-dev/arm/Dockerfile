@@ -27,7 +27,7 @@ RUN chmod +x /usr/local/sbin/run_sshd.sh
 RUN echo 'root:123456' | chpasswd
 RUN echo 'glue_user:123456' | chpasswd
 
-ENV PYTHONPATH: /home/glue_user/aws-glue-libs/PyGlue.zip:/home/glue_user/spark/python/lib/py4j-0.10.9-src.zip:/home/glue_user/spark/python/
+ENV PYTHONPATH: /home/glue_user/aws-glue-libs/PyGlue.zip:/home/glue_user/spark/python/lib/py4j-0.10.9.5-src.zip:/home/glue_user/spark/python/
 ENV HADOOP_CONF_DIR: /home/glue_user/spark/conf
 ENV LD_LIBRARY_PATH: /home/glue_user/native_libs/amd64/hadoop-lzo-native:/home/glue_user/native_libs/amd64/hadoop-native/
 ENV LOCALSTACK_HOSTNAME: localstack
