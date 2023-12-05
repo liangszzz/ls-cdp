@@ -1,13 +1,5 @@
 from awsglue.context import GlueContext
-from pyspark.sql.functions import (
-    col,
-    decode,
-    encode,
-    regexp_replace,
-    substring,
-    to_date,
-    trim,
-)
+from pyspark.sql.functions import col, decode, encode, substring, to_date, trim
 
 from src.main.cdp.common.base import Base
 from src.main.cdp.common.config import Config, ConfigType
@@ -82,5 +74,5 @@ class Etl(Base):
 
 if __name__ == "__main__":
     context = glue_utils.get_glue_context()
-    config = Config(ConfigType.S3, "ryozen-glue", "etl001/etl001_fixed.ini", None)
+    config = Config(ConfigType.S3.value, "ryozen-glue", "etl001/etl001_fixed.ini", None)
     Etl(context, config).run()

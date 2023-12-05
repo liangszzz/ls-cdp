@@ -1,29 +1,24 @@
 import os
-import sys
 
+import boto3
 from boto3 import client, resource
 
 from src.main.cdp.common.exceptions import S3FileNotExistException
-
-endpoint_url = "http://localstack:4566"
-aws_access_key_id = "test"
-aws_secret_access_key = "test"
-region_name = "ap-northeast-1"
+from src.main.cdp.utils.sys_utils import is_dev_env
 
 s3_cache = {"s3": None, "s3r": None}
+
+local_endpoint_url = "http://localstack:4566"
 
 
 def get_client() -> client:
     if s3_cache["s3"] is not None:
         return s3_cache["s3"]
-    if "--dev" in sys.argv:
-        s3 = client(
+    if is_dev_env():
+        session = boto3.Session()
+        s3 = session.client(
             "s3",
-            endpoint_url=endpoint_url,
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-            region_name=region_name,
-            use_ssl=False,
+            endpoint_url=local_endpoint_url,
         )
     else:
         s3 = client("s3")
@@ -35,14 +30,10 @@ def get_resource() -> client:
     if s3_cache["s3r"] is not None:
         return s3_cache["s3r"]
 
-    if "--dev" in sys.argv:
+    if is_dev_env():
         s3r = resource(
             "s3",
-            endpoint_url=endpoint_url,
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-            region_name=region_name,
-            use_ssl=False,
+            endpoint_url=local_endpoint_url,
         )
     else:
         s3r = resource("s3")
@@ -91,8 +82,8 @@ def read_s3_file(s3: client, bucket: str, path: str) -> str:
     Returns:
         str: the content of the file.
     """
-    response = s3.get_object(Bucket=bucket, Key=path)
-    if "Body" in response:
+    if check_s3_file_or_dir_exist(s3, bucket, path, False):
+        response = s3.get_object(Bucket=bucket, Key=path)
         return response["Body"].read().decode("utf-8")
     raise S3FileNotExistException(f"s3://{bucket}/{path}")
 
@@ -138,11 +129,8 @@ def upload_dir_or_file(local_path: str, s3: client, bucket: str):
     for root, _, files in os.walk(local_path):
         for file in files:
             file_path = os.path.join(root, file)
-            if os.path.isfile(file_path):
-                s3_key = os.path.join("", os.path.relpath(file_path, local_path))
-                s3.upload_file(file_path, bucket, s3_key.replace("\\", "/", -1))
-            else:
-                upload_dir_or_file(file_path, s3, bucket)
+            s3_key = os.path.join("", os.path.relpath(file_path, local_path))
+            s3.upload_file(file_path, bucket, s3_key.replace("\\", "/", -1))
 
 
 def download_s3_bucket(s3: client, bucket: str, local_path: str) -> None:

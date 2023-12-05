@@ -1,2 +1,2 @@
 #!/bin/bash
-poetry run flake8 --format=json --output-file=.checks/flake8_results.json src
+poetry run flake8 src 2>&1 | tee .checks/flake8_output.txt

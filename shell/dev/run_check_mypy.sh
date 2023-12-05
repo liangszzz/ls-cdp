@@ -1,2 +1,2 @@
 #!/bin/bash
-poetry run mypy src > .checks/mypy_output.txt 2>&1
+poetry run mypy src 2>&1 | tee .checks/mypy_output.txt

@@ -50,15 +50,15 @@ class ConfigType(Enum):
 
 @dataclass
 class Config:
-    config_type: ConfigType
+    config_type: str
     bucket: Union[None, str]
     prefix: Union[None, str]
     file_path: Union[None, str]
 
     def load_config(self) -> Dict[str, str]:
-        if self.config_type == ConfigType.S3 and self.bucket is not None and self.prefix is not None:
+        if self.config_type == ConfigType.S3.value and self.bucket is not None and self.prefix is not None:
             return self.load_config_from_s3(self.bucket, self.prefix)
-        elif self.config_type == ConfigType.LOCAL and self.file_path is not None:
+        elif self.config_type == ConfigType.LOCAL.value and self.file_path is not None:
             return self.load_config_from_file(self.file_path)
         else:
             raise NotImplementedException()

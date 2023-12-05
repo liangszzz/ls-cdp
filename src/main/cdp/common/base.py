@@ -41,19 +41,25 @@ class Base:
         if ConfigFile.OPTIONAL_PARAMS.value in self.config_dict:
             arr = self.config_dict[ConfigFile.OPTIONAL_PARAMS.value].split(",")
             for item in arr:
+                if item.strip() == "":
+                    continue
                 if sys_utils.check_sys_arg_exists(item, "--"):
                     self.optional_params.append(item)
         return None
 
     def init_required_params(self) -> None:
         if ConfigFile.REQUIRED_PARAMS.value in self.config_dict:
-            self.require_params.extend(self.config_dict[ConfigFile.REQUIRED_PARAMS.value].split(","))
+            arr = self.config_dict[ConfigFile.REQUIRED_PARAMS.value].split(",")
+            for item in arr:
+                if item.strip() == "":
+                    continue
+                self.require_params.append(item)
         return None
 
     def check_required_params(self) -> None:
         for param in self.require_params:
             if not sys_utils.check_sys_arg_exists(param, "--"):
-                raise exceptions.ParamNotFoundException(param)
+                raise exceptions.ParamNotFoundException(param, None)
 
     def init_job(self) -> None:
         self.job = Job(self.context)
@@ -119,7 +125,7 @@ class Base:
         try:
             bucket = self.config_dict[f"{section}.{InputOutputConfig.BUCKET.value}"]
             prefix = self.config_dict[f"{section}.{InputOutputConfig.PATH.value}"]
-            view_name = self.config_dict[f"{section}.{InputOutputConfig.TABLE_NAME.value}"]
+            table_name = self.config_dict[f"{section}.{InputOutputConfig.TABLE_NAME.value}"]
             required = self.config_dict[f"{section}.{InputOutputConfig.REQUIRED.value}"]
             schema = self.config_dict[f"{section}.{InputOutputConfig.SCHEMA.value}"]
             file_type = self.config_dict[f"{section}.{InputOutputConfig.TYPE.value}"]
@@ -127,13 +133,12 @@ class Base:
             success_msg = self.config_dict[f"{section}.{InputOutputConfig.SUCCESS_MSG.value}"]
             error_msg = self.config_dict[f"{section}.{InputOutputConfig.ERROR_MSG.value}"]
         except Exception as e:
-            # TODO
-            raise exceptions.BizException("BizException")
+            raise exceptions.ParamNotFoundException("config file ParamNotFoundException", e)
 
         if format_map is not None:
             bucket = bucket.format_map(format_map)
             prefix = prefix.format_map(format_map)
-            view_name = view_name.format_map(format_map)
+            table_name = table_name.format_map(format_map)
             required = required.format_map(format_map)
             schema = schema.format_map(format_map)
             file_type = file_type.format_map(format_map)
@@ -164,7 +169,7 @@ class Base:
             df.cache()
 
         if create_view_flag:
-            df.createOrReplaceTempView(view_name)
+            df.createOrReplaceTempView(table_name)
 
         self.logger.info(success_msg)
         return df
@@ -176,11 +181,14 @@ class Base:
         optional_args: Dict[str, Any],
         format_map: Union[None, Dict[str, str]] = None,
     ) -> None:
-        file_type = self.config_dict[f"{section}.{InputOutputConfig.TYPE.value}"]
-        bucket = self.config_dict[f"{section}.{InputOutputConfig.BUCKET.value}"]
-        prefix = self.config_dict[f"{section}.{InputOutputConfig.PATH.value}"]
-        success_msg = self.config_dict[f"{section}.{InputOutputConfig.SUCCESS_MSG.value}"]
-        error_msg = self.config_dict[f"{section}.{InputOutputConfig.ERROR_MSG.value}"]
+        try:
+            file_type = self.config_dict[f"{section}.{InputOutputConfig.TYPE.value}"]
+            bucket = self.config_dict[f"{section}.{InputOutputConfig.BUCKET.value}"]
+            prefix = self.config_dict[f"{section}.{InputOutputConfig.PATH.value}"]
+            success_msg = self.config_dict[f"{section}.{InputOutputConfig.SUCCESS_MSG.value}"]
+            error_msg = self.config_dict[f"{section}.{InputOutputConfig.ERROR_MSG.value}"]
+        except Exception as e:
+            raise exceptions.ParamNotFoundException("config file ParamNotFoundException", e)
 
         if format_map is not None:
             bucket = bucket.format_map((format_map))

@@ -74,5 +74,5 @@ class Etl(Base):
 
 if __name__ == "__main__":
     context = glue_utils.get_glue_context()
-    config = Config(ConfigType.S3, "ryozen-glue", "etl001/etl001.ini", None)
+    config = Config(ConfigType.S3.value, "ryozen-glue", "etl001/etl001.ini", None)
     Etl(context, config).run()

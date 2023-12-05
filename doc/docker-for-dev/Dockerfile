@@ -5,8 +5,9 @@ USER root
 
 RUN yum update -y
 
-RUN yum install -y openssh-server && yum install -y passwd && yum install -y openssh-clients && yum clean all
-
+RUN yum install -y openssh-server && yum install -y passwd && yum install -y openssh-clients
+RUN yum install -y libxslt-devel libxml2-devel
+RUN yum clean all
 ADD doc/docker-for-dev/ssh_file/ssh_host_ecdsa_key /etc/ssh/ssh_host_ecdsa_key
 ADD doc/docker-for-dev/ssh_file/ssh_host_ed25519_key /etc/ssh/ssh_host_ed25519_key
 ADD doc/docker-for-dev/ssh_file/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key

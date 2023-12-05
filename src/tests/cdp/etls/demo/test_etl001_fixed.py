@@ -21,7 +21,7 @@ def test_run_fixed(glue_context, s3, caplog, tmpdir, local_pre, upload_data):
     sys.argv.append("--split_name=id,name,age,birthday,address_code")
     sys.argv.append("--charset=shift-jis")
 
-    config = Config(ConfigType.S3, "cdp-input0", "etl001_fixed.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-input0", "etl001_fixed.ini", None)
     etl = Etl(glue_context, config)
     etl.run()
 
