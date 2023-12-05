@@ -26,13 +26,13 @@ jobs:
           sleep 10
       - name: run_check_bandit
         run: |
-          docker exec glue4 /home/glue_user/workspace/fj-cdp/shell/test/run_check_bandit.sh
+          docker exec glue4 /home/glue_user/workspace/ls-cdp/shell/test/run_check_bandit.sh
       - name: run_check_flake8
         run: |
-          docker exec glue4 /home/glue_user/workspace/fj-cdp/shell/test/run_check_flake8.sh
+          docker exec glue4 /home/glue_user/workspace/ls-cdp/shell/test/run_check_flake8.sh
       - name: run_check_mypy
         run: |
-          docker exec glue4 /home/glue_user/workspace/fj-cdp/shell/test/run_check_mypy.sh
+          docker exec glue4 /home/glue_user/workspace/ls-cdp/shell/test/run_check_mypy.sh
       - name: run_pytest
         run: |
-          docker exec glue4 /home/glue_user/workspace/fj-cdp/shell/test/run_pytest.sh
+          docker exec glue4 /home/glue_user/workspace/ls-cdp/shell/test/run_pytest.sh

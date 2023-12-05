@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "fj-cdp"
+name = "ls-cdp"
 version = "0.1.0"
 description = ""
 authors = ["liangszzz <liang-shan@outlook.com>"]

@@ -84,7 +84,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes: 
-      - ./fj-cdp:/home/glue_user/workspace/jupyter_workspace/fj-cdp
+      - ./ls-cdp:/home/glue_user/workspace/jupyter_workspace/ls-cdp
     depends_on: 
       - localstack
     networks: 
