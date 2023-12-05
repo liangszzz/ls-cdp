@@ -1,4 +1,4 @@
-from src.main.cdp.utils.sys_utils import *
+from src.main.cdp.utils.sys_utils import check_sys_arg_exists, is_dev_env
 
 
 def test_check_sys_arg_exists():

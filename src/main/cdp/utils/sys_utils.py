@@ -1,6 +1,4 @@
-import configparser
 import sys
-from typing import Dict
 
 
 def check_sys_arg_exists(arg: str, prefix: str) -> bool:

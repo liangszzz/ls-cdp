@@ -3,7 +3,6 @@ import sys
 import pytest
 
 from src.main.cdp.utils import s3_utils
-from src.main.cdp.utils.s3_utils import upload_dir_or_file
 
 
 def test_get_client_1(s3):
@@ -67,4 +66,4 @@ def test_test_client_and_resource(s3):
 
 @pytest.fixture(scope="function")
 def upload_data(s3, local_pre):
-    upload_dir_or_file(f"{local_pre}/src/tests/resources/utils/s3utils/input1", s3, "cdp-input1")
+    s3_utils.upload_dir_or_file(f"{local_pre}/src/tests/resources/utils/s3utils/input1", s3, "cdp-input1")
