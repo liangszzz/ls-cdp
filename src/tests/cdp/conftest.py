@@ -17,12 +17,14 @@ region_name = "ap-northeast-1"
 
 logger = log_utils.get_logger(__name__)
 
+
 @pytest.fixture(scope="function", autouse=True)
 def s3_handler():
     clear_sys_argv()
-    s3=get_client()
+    s3 = get_client()
     s3_delete_bucket(s3)
     s3_create_bucket(s3)
+
 
 @pytest.fixture(scope="function")
 def s3():
@@ -40,7 +42,6 @@ def local_pre():
     except Exception as e:
         logger.error(e)
     return current_module_path
-
 
 
 @pytest.fixture(scope="function")
