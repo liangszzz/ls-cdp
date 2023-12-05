@@ -19,7 +19,7 @@ def get_value(secret_name: str, region_name: str = "ap-northeast-1", endpoint_ur
 
 
 def create_value(
-        secret_name: str, secret_value: str, region_name: str = "ap-northeast-1", endpoint_url: Union[str, None] = None
+    secret_name: str, secret_value: str, region_name: str = "ap-northeast-1", endpoint_url: Union[str, None] = None
 ) -> None:
     if endpoint_url is None:
         secretsmanager = client("secretsmanager", region_name=region_name)

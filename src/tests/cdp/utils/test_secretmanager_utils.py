@@ -1,9 +1,9 @@
 import uuid
 
 import pytest
+from boto3 import client
 
 from src.main.cdp.utils.secretmanager_utils import create_value, get_value
-from boto3 import client
 
 
 def test_create_key(del_secret_key):
@@ -39,10 +39,10 @@ def test_run_fail(del_secret_key):
 @pytest.fixture()
 def del_secret_key():
     secretsmanager = client("secretsmanager", region_name="ap-northeast-1", endpoint_url="http://localstack:4566")
-    paginator = secretsmanager.get_paginator('list_secrets')
+    paginator = secretsmanager.get_paginator("list_secrets")
     for page in paginator.paginate():
-        for secret in page['SecretList']:
+        for secret in page["SecretList"]:
             if "DeletedDate" in secret and secret["DeletedDate"] is not None:
                 pass
             else:
-                secretsmanager.delete_secret(SecretId=secret['Name'])
+                secretsmanager.delete_secret(SecretId=secret["Name"])
