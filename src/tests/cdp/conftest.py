@@ -17,11 +17,15 @@ region_name = "ap-northeast-1"
 
 logger = log_utils.get_logger(__name__)
 
+@pytest.fixture(scope="function", autouse=True)
+def s3_handler():
+    clear_sys_argv()
+    s3=get_client()
+    s3_delete_bucket(s3)
+    s3_create_bucket(s3)
 
 @pytest.fixture(scope="function")
 def s3():
-    logger.info("--------------------------start s3 init---------------------------")
-    sys.argv.append("--dev")
     return get_client()
 
 
@@ -38,16 +42,9 @@ def local_pre():
     return current_module_path
 
 
-@pytest.fixture(scope="function", autouse=True)
-def s3_handler(s3):
-    s3_delete_bucket(s3)
-    s3_create_bucket(s3)
-
 
 @pytest.fixture(scope="function")
 def glue_context(tmpdir):
-    clear_sys_argv()
-
     spark_context = (
         SparkSession.builder.config("spark.hadoop.fs.s3a.endpoint", endpoint_url)
         .config("fs.s3a.access.key", aws_access_key_id)
@@ -115,8 +112,8 @@ def delete_s3_bucket(bucket: str):
                 file_key = obj["Key"]
                 s3.delete_object(Bucket=bucket, Key=file_key)
         s3.delete_bucket(Bucket=bucket)
-    except Exception as e:
-        logger.error("delete s3 bucket error", e)
+    except Exception:
+        logger.error("delete s3 bucket error")
 
 
 def clear_sys_argv():

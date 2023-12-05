@@ -82,11 +82,9 @@ services:
     container_name: glue4
     build:
       context: .
-      dockerfile: doc/docker-for-dev/Dockerfile
+      dockerfile: doc/docker-for-dev/arm/Dockerfile
     ports:
       - 2222:22
-    environment:
-      PYTHONPATH: /home/glue_user/aws-glue-libs/PyGlue.zip:/home/glue_user/spark/python/lib/py4j-0.10.9-src.zip:/home/glue_user/spark/python/
     depends_on:
       - localstack
     networks:
