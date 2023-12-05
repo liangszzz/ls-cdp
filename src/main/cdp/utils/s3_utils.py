@@ -1,5 +1,6 @@
 import os
 
+import boto3
 from boto3 import client, resource
 
 from src.main.cdp.common.exceptions import S3FileNotExistException
@@ -14,10 +15,10 @@ def get_client() -> client:
     if s3_cache["s3"] is not None:
         return s3_cache["s3"]
     if is_dev_env():
-        s3 = client(
+        session = boto3.Session()
+        s3 = session.client(
             "s3",
             endpoint_url=local_endpoint_url,
-            use_ssl=False,
         )
     else:
         s3 = client("s3")
@@ -33,7 +34,6 @@ def get_resource() -> client:
         s3r = resource(
             "s3",
             endpoint_url=local_endpoint_url,
-            use_ssl=False,
         )
     else:
         s3r = resource("s3")
@@ -82,14 +82,14 @@ def read_s3_file(s3: client, bucket: str, path: str) -> str:
     Returns:
         str: the content of the file.
     """
-    response = s3.get_object(Bucket=bucket, Key=path)
-    if "Body" in response:
+    if check_s3_file_or_dir_exist(s3, bucket, path, False):
+        response = s3.get_object(Bucket=bucket, Key=path)
         return response["Body"].read().decode("utf-8")
     raise S3FileNotExistException(f"s3://{bucket}/{path}")
 
 
 def rename_s3_file(
-    s3: client, input_bucket: str, output_bucket: str, input_path: str, output_path: str, delete: bool
+        s3: client, input_bucket: str, output_bucket: str, input_path: str, output_path: str, delete: bool
 ) -> None:
     """
     Rename a file from an S3 bucket at a given path.
@@ -129,11 +129,8 @@ def upload_dir_or_file(local_path: str, s3: client, bucket: str):
     for root, _, files in os.walk(local_path):
         for file in files:
             file_path = os.path.join(root, file)
-            if os.path.isfile(file_path):
-                s3_key = os.path.join("", os.path.relpath(file_path, local_path))
-                s3.upload_file(file_path, bucket, s3_key.replace("\\", "/", -1))
-            else:
-                upload_dir_or_file(file_path, s3, bucket)
+            s3_key = os.path.join("", os.path.relpath(file_path, local_path))
+            s3.upload_file(file_path, bucket, s3_key.replace("\\", "/", -1))
 
 
 def download_s3_bucket(s3: client, bucket: str, local_path: str) -> None:

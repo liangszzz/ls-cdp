@@ -19,16 +19,45 @@ logger = log_utils.get_logger(__name__)
 
 
 @pytest.fixture(scope="function", autouse=True)
-def s3_handler():
-    clear_sys_argv()
-    s3 = get_client()
-    s3_delete_bucket(s3)
-    s3_create_bucket(s3)
+def clear_sys_argv():
+    logger.info("--------------------------start args init---------------------------")
+    sys.argv.clear()
+    sys.argv.append("--JOB_NAME")
+    sys.argv.append("test")
+    sys.argv.append("--JOB_NAME=test")
+    sys.argv.append("--dev")
+    logger.info("--------------------------end args init---------------------------")
 
 
-@pytest.fixture(scope="function")
-def s3():
+@pytest.fixture(scope="function", autouse=True)
+def s3(clear_sys_argv):
     return get_client()
+
+
+@pytest.fixture(scope="function", autouse=True)
+def s3_create_bucket(s3):
+    logger.info("--------------------------start s3 bucket create---------------------------")
+    for i in range(0, 10):
+        try:
+            s3.head_bucket(Bucket=input_bucket + str(i))
+        except Exception:
+            s3.create_bucket(
+                Bucket=input_bucket + str(i),
+                CreateBucketConfiguration={"LocationConstraint": region_name},
+            )
+    for i in range(0, 10):
+        try:
+            s3.head_bucket(Bucket=output_bucket + str(i))
+        except Exception:
+            s3.create_bucket(
+                Bucket=output_bucket + str(i),
+                CreateBucketConfiguration={"LocationConstraint": region_name},
+            )
+    logger.info("--------------------------end s3 bucket create---------------------------")
+
+    yield
+
+    s3_delete_bucket()
 
 
 @pytest.fixture(scope="function", autouse=False)
@@ -38,14 +67,14 @@ def local_pre():
     current_module_path = current_module_path[:index]
 
     try:
-        shutil.rmtree(f"{current_module_path}/download")
+        shutil.rmtree(f"{current_module_path}download")
     except Exception as e:
         logger.error(e)
     return current_module_path
 
 
 @pytest.fixture(scope="function")
-def glue_context(tmpdir):
+def glue_context(tmpdir, clear_sys_argv):
     spark_context = (
         SparkSession.builder.config("spark.hadoop.fs.s3a.endpoint", endpoint_url)
         .config("fs.s3a.access.key", aws_access_key_id)
@@ -71,28 +100,7 @@ def glue_context(tmpdir):
         logger.error(e)
 
 
-def s3_create_bucket(s3):
-    logger.info("--------------------------start s3 bucket create---------------------------")
-    for i in range(0, 10):
-        try:
-            s3.head_bucket(Bucket=input_bucket + str(i))
-        except Exception:
-            s3.create_bucket(
-                Bucket=input_bucket + str(i),
-                CreateBucketConfiguration={"LocationConstraint": region_name},
-            )
-    for i in range(0, 10):
-        try:
-            s3.head_bucket(Bucket=output_bucket + str(i))
-        except Exception:
-            s3.create_bucket(
-                Bucket=output_bucket + str(i),
-                CreateBucketConfiguration={"LocationConstraint": region_name},
-            )
-    logger.info("--------------------------end s3 bucket create---------------------------")
-
-
-def s3_delete_bucket(s3):
+def s3_delete_bucket():
     logger.info("--------------------------start s3 bucket delete---------------------------")
     for i in range(0, 10):
         delete_s3_bucket(input_bucket + str(i))
@@ -115,13 +123,3 @@ def delete_s3_bucket(bucket: str):
         s3.delete_bucket(Bucket=bucket)
     except Exception:
         logger.error("delete s3 bucket error")
-
-
-def clear_sys_argv():
-    logger.info("--------------------------start args init---------------------------")
-    sys.argv.clear()
-    sys.argv.append("--JOB_NAME")
-    sys.argv.append("test")
-    sys.argv.append("--JOB_NAME=test")
-    sys.argv.append("--dev")
-    logger.info("--------------------------end args init---------------------------")
