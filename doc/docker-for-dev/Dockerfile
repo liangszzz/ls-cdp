@@ -15,11 +15,11 @@ ADD doc/docker-for-dev/ssh_file/ssh_host_ecdsa_key.pub /etc/ssh/ssh_host_ecdsa_k
 ADD doc/docker-for-dev/ssh_file/ssh_host_ed25519_key.pub /etc/ssh/ssh_host_ed25519_key.pub
 ADD doc/docker-for-dev/ssh_file/ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub
 
-RUN chmod 600 -R /etc/ssh/*
+RUN chmod 644 /etc/ssh/*
 
 ADD doc/docker-for-dev/ssh_file/sshd_config /etc/ssh/sshd_config
 
-RUN chmod 644 -R /etc/ssh/sshd_config
+RUN chmod 644 /etc/ssh/sshd_config
 
 ADD doc/docker-for-dev/shell/run_sshd.sh /usr/local/sbin/run_sshd.sh
 RUN chmod +x /usr/local/sbin/run_sshd.sh
@@ -37,22 +37,19 @@ ENV AWS_ACCESS_KEY_ID: test
 ENV AWS_SECRET_ACCESS_KEY: test
 ENV DEFAULT_REGION: ap-northeast-1
 
-EXPOSE 22
-EXPOSE 8080
-EXPOSE 18080
-EXPOSE 4040
-EXPOSE 8443
-EXPOSE 8888
-EXPOSE 8998
-
-CMD ["/usr/local/sbin/run_sshd.sh"]
+COPY . /home/glue_user/workspace/ls-cdp
+RUN chown -R glue_user /home/glue_user/workspace/ls-cdp
+USER glue_user
 
 RUN python3 -m pip install --upgrade pip
+RUN python3 -m pip install -U poetry
 
-COPY . /home/glue_user/workspace/ls-cdp
 WORKDIR /home/glue_user/workspace/ls-cdp
-RUN pip install -U poetry
-RUN poetry install -v
+#
+RUN ~/.local/bin/poetry install -v
+##
 RUN aws configure set aws_access_key_id "test" --profile default && aws configure set aws_secret_access_key "test" --profile default && aws configure set region "ap-northeast-1" --profile default && aws configure set output "text" --profile default
-RUN chmod -R 755 shell/dev/*.sh
+RUN chmod +x shell/dev/*.sh
 RUN mkdir .checks
+
+CMD ["/usr/local/sbin/run_sshd.sh"]

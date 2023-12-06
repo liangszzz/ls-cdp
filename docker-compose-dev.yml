@@ -85,8 +85,12 @@ services:
       dockerfile: doc/docker-for-dev/Dockerfile
     ports:
       - 2222:22
-    environment:
-      PYTHONPATH: /home/glue_user/aws-glue-libs/PyGlue.zip:/home/glue_user/spark/python/lib/py4j-0.10.9-src.zip:/home/glue_user/spark/python/
+      - 18080:18080
+      - 8080:8080
+      - 4040:4040
+      - 8443:8443
+      - 8888:8888
+      - 8998:8998
     depends_on:
       - localstack
     networks:
