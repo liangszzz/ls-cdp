@@ -1,0 +1,27 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Entered the install phase...
+      - docker-compose -f docker-compose-test.yml up -d
+    finally:
+      - echo docker-compose failed
+  pre_build:
+    commands:
+      - echo Entered the pre_build phase...
+      - docker login <company_url> -u <username> -p <access_token>
+    finally:
+      - echo This always runs even if the login command fails
+  build:
+    commands:
+      - docker exec glue4 /home/glue_user/workspace/ls-cdp/shell/test/run_check_bandit.sh
+      - docker exec glue4 /home/glue_user/workspace/ls-cdp/shell/test/run_check_flake8.sh
+      - docker exec glue4 /home/glue_user/workspace/ls-cdp/shell/test/run_check_mypy.sh
+      - docker exec glue4 /home/glue_user/workspace/ls-cdp/shell/test/run_pytest.sh
+    finally:
+      - echo This always runs even if the install command fails
+  post_build:
+    commands:
+      - echo Entered the post_build phase...
+      - echo Build completed on `date`ß
