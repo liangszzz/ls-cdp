@@ -5,7 +5,7 @@ from src.main.cdp.utils.s3_utils import upload_dir_or_file
 
 
 def test_load_config(upload_data):
-    config = Config(ConfigType.S3.value, "cdp-input0", "common.ini", None)
+    config = Config(ConfigType.S3.value, "cdp-code", "common.ini", None)
     config.load_config()
 
     config2 = Config(ConfigType.LOCAL.value, None, None, "src/tests/resources/common/config/config/common.ini")
@@ -20,4 +20,4 @@ def test_load_config(upload_data):
 
 @pytest.fixture(scope="function")
 def upload_data(s3, local_pre):
-    upload_dir_or_file(f"{local_pre}/src/tests/resources/common/config/config", s3, "cdp-input0")
+    upload_dir_or_file(f"{local_pre}/src/tests/resources/common/config/config", s3, "cdp-code")

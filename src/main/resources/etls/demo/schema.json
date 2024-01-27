@@ -1,0 +1,22 @@
+{
+  "etl001": {
+    "data_check": {
+      "A": {
+        "isNumber": "true",
+        "maxValue": "1000"
+      },
+
+      "B": {
+        "isString": "true",
+        "maxLength": "10"
+      },
+
+      "C": {
+        "isDate": "true",
+        "dateFormat": "yyyy-mm-dd",
+        "maxDate": "2024-12-30"
+      }
+
+    }
+  }
+}

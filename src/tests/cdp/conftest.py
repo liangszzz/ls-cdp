@@ -37,7 +37,16 @@ def s3(clear_sys_argv):
 @pytest.fixture(scope="function", autouse=True)
 def s3_create_bucket(s3):
     logger.info("--------------------------start s3 bucket create---------------------------")
-    for i in range(0, 10):
+
+    try:
+        s3.head_bucket(Bucket="code")
+    except Exception:
+        s3.create_bucket(
+            Bucket="cdp-code",
+            CreateBucketConfiguration={"LocationConstraint": region_name},
+        )
+
+    for i in range(1, 10):
         try:
             s3.head_bucket(Bucket=input_bucket + str(i))
         except Exception:
@@ -45,7 +54,7 @@ def s3_create_bucket(s3):
                 Bucket=input_bucket + str(i),
                 CreateBucketConfiguration={"LocationConstraint": region_name},
             )
-    for i in range(0, 10):
+    for i in range(1, 10):
         try:
             s3.head_bucket(Bucket=output_bucket + str(i))
         except Exception:
@@ -102,10 +111,11 @@ def glue_context(tmpdir, clear_sys_argv):
 
 def s3_delete_bucket():
     logger.info("--------------------------start s3 bucket delete---------------------------")
-    for i in range(0, 10):
+    delete_s3_bucket("cdp-code")
+    for i in range(1, 10):
         delete_s3_bucket(input_bucket + str(i))
 
-    for i in range(0, 10):
+    for i in range(1, 10):
         delete_s3_bucket(output_bucket + str(i))
 
     logger.info("--------------------------end s3 bucket delete---------------------------")
