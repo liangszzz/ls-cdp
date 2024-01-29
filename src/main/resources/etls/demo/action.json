@@ -1,0 +1,27 @@
+{
+  "parameters": [
+    {
+      "TODAY": {
+        "type": "function",
+        "function": "getToday"
+      },
+      "TOMORROW": {
+        "type": "function",
+        "function": "getTomorrow"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "load csv file 1",
+      "action": "load_csv",
+      "dir": true,
+      "file": "s3://ls-cdp/etls/{TODAY}/csv1.csv",
+      "options": {
+        "name": "delimiter",
+        "value": ","
+      },
+      "result": "input1_df"
+    }
+  ]
+}
